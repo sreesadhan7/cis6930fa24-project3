@@ -35,6 +35,35 @@ def cluster_and_visualize(incidents_df):
     plt.savefig(scatter_plot_path)
     plt.close()
 
+    # Visualization 1.1: Nature Clustering based on Counts
+    nature_counts = incidents_df['nature'].value_counts().reset_index()
+    nature_counts.columns = ['nature', 'count']
+    nature_counts['nature_encoded'] = pd.factorize(nature_counts['nature'])[0]
+
+    # Clustering based on nature and count
+    kmeans_counts = KMeans(n_clusters=3, random_state=42)
+    nature_counts['cluster'] = kmeans_counts.fit_predict(nature_counts[['nature_encoded', 'count']])
+
+    # Scatter Plot for Nature and Count Clustering
+    plt.figure(figsize=(10, 6))
+    for cluster_id in nature_counts['cluster'].unique():
+        cluster_data = nature_counts[nature_counts['cluster'] == cluster_id]
+        plt.scatter(
+            cluster_data['nature_encoded'],
+            cluster_data['count'],
+            label=f'Cluster {cluster_id}'
+        )
+    plt.title('Clustering of Incident Records (Nature and Count)')
+    plt.xlabel('Nature (Encoded)')
+    plt.ylabel('Count')
+    plt.legend()
+    nature_clustering_path = os.path.join(os.path.dirname(__file__), 'static', 'nature_clustering.png')
+    plt.savefig(nature_clustering_path)
+    plt.close()
+
+    print(f"Scatter plot saved at: {scatter_plot_path}")
+    print(f"Nature clustering plot saved at: {nature_clustering_path}")
+
     # Visualization 2: Bar Graph for Nature Counts
     nature_counts = incidents_df['nature'].value_counts()
     plt.figure(figsize=(10, 6))
@@ -59,3 +88,10 @@ def cluster_and_visualize(incidents_df):
     print(f"Scatter plot saved at: {scatter_plot_path}")
     print(f"Bar graph saved at: {bar_graph_path}")
     print(f"Pie chart saved at: {pie_chart_path}")
+
+    # Extract the status output (nature and count)
+    status_output = incidents_df['nature'].value_counts().reset_index()
+    status_output.columns = ['nature', 'count']
+
+    # Return the status output DataFrame
+    return status_output

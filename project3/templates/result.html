@@ -2,58 +2,120 @@
 <html>
 <head>
     <title>Visualization Results</title>
+    <style>
+        /* Add some basic styling */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .left-side {
+            flex: 2;
+            min-width: 600px;
+        }
+
+        .right-side {
+            flex: 1;
+            margin-left: 20px;
+            max-width: 400px;
+        }
+
+        .visualization {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Data Clustering and Visualization</h1>
 
-    <!-- Visualization 1: Incident Clusters -->
-    <div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
-        <!-- Graph Section -->
-        <div>
-            <h2>1) Incident Clusters</h2>
-            <img src="{{ url_for('static', filename='cluster_plot.png') }}" alt="Clustering Plot" style="max-width: 600px;">
-        </div>
+    <div class="container">
+        <!-- Left Side: Visualizations -->
+        <div class="left-side">
+            <!-- Visualization 1: Incident Clusters -->
+            <div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h2>1) Incident Clusters</h2>
+                    <img src="{{ url_for('static', filename='cluster_plot.png') }}" alt="Clustering Plot" style="max-width: 600px;">
+                </div>
+                <div style="margin-left: 20px; max-width: 400px;">
+                    <h2>Graph Explanation</h2>
+                    <p><strong>X-Axis:</strong> Incident Number (unique identifier for incidents).</p>
+                    <p><strong>Y-Axis:</strong> Encoded Nature of Incidents (numerical representation of incident types).</p>
+                    <p><strong>Clusters:</strong> Each color represents a distinct cluster formed using K-Means clustering. Incidents in the same cluster share similar characteristics, such as the type of incident (e.g., theft, accident).</p>
+                </div>
+            </div>
 
-        <!-- Explanation Section -->
-        <div style="margin-left: 20px; max-width: 400px;">
-            <h2>Graph Explanation</h2>
-            <p><strong>X-Axis:</strong> Incident Number (unique identifier for incidents).</p>
-            <p><strong>Y-Axis:</strong> Encoded Nature of Incidents (numerical representation of incident types).</p>
-            <p><strong>Clusters:</strong> Each color represents a distinct cluster formed using K-Means clustering. Incidents in the same cluster share similar characteristics, such as the type of incident (e.g., theft, accident).</p>
+            <!-- Visualization 1.1: Nature Clustering -->
+            <div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h2>1.1) Clustering of Incident Records (Nature and Count)</h2>
+                    <img src="{{ url_for('static', filename='nature_clustering.png') }}" alt="Nature Clustering Plot" style="max-width: 600px;">
+                </div>
+                <div style="margin-left: 20px; max-width: 400px;">
+                    <h2>Graph Explanation</h2>
+                    <p><strong>X-Axis:</strong> Encoded Nature (unique identifier for incident types).</p>
+                    <p><strong>Y-Axis:</strong> Count of incidents for each type.</p>
+                    <p><strong>Clusters:</strong> Each color represents a cluster of incident types with similar frequencies. This graph helps in identifying groups of incident types that occur at similar rates.</p>
+                </div>
+            </div>
+
+            <!-- Visualization 2: Comparison of Incident Types -->
+            <div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                    <h2>2) Comparison of Incident Types</h2>
+                    <img src="{{ url_for('static', filename='bar_graph.png') }}" alt="Bar Graph" style="max-width: 600px;">
+                </div>
+                <div style="margin-left: 20px; max-width: 400px;">
+                    <h2>Graph Explanation</h2>
+                    <p><strong>X-Axis:</strong> Incident Types (Nature).</p>
+                    <p><strong>Y-Axis:</strong> Count of each incident type.</p>
+                    <p><strong>Description:</strong> This bar graph compares the number of occurrences of each incident type. It highlights the most frequent incident types in the dataset.</p>
+                </div>
+            </div>
+
+            <!-- Visualization 3: Incident Nature Distribution -->
+            <div style="display: flex; align-items: flex-start;">
+                <div>
+                    <h2>3) Incident Nature Distribution</h2>
+                    <img src="{{ url_for('static', filename='pie_chart.png') }}" alt="Pie Chart" style="max-width: 600px;">
+                </div>
+                <div style="margin-left: 20px; max-width: 400px;">
+                    <h2>Graph Explanation</h2>
+                    <p><strong>Description:</strong> This pie chart shows the proportion of each incident type relative to the total dataset. Each slice represents an incident type, with its size indicating its percentage of the total.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side: Status Output Table -->
+        <div class="right-side">
+            <h2>Status Output</h2>
+            <table>
+                <tr>
+                    <th>Nature</th>
+                    <th>Count</th>
+                </tr>
+                {% for item in status_output %}
+                <tr>
+                    <td>{{ item.nature }}</td>
+                    <td>{{ item.count }}</td>
+                </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
-
-    <!-- Visualization 2: Bar Graph -->
-    <div style="display: flex; align-items: flex-start; margin-bottom: 20px;">
-        <!-- Graph Section -->
-        <div>
-            <h2>2) Comparison of Incident Types</h2>
-            <img src="{{ url_for('static', filename='bar_graph.png') }}" alt="Bar Graph" style="max-width: 600px;">
-        </div>
-
-        <!-- Explanation Section -->
-        <div style="margin-left: 20px; max-width: 400px;">
-            <h2>Graph Explanation</h2>
-            <p><strong>X-Axis:</strong> Incident Types (Nature).</p>
-            <p><strong>Y-Axis:</strong> Count of each incident type.</p>
-            <p><strong>Description:</strong> This bar graph compares the number of occurrences of each incident type. It highlights the most frequent incident types in the dataset.</p>
-        </div>
-    </div>
-
-    <!-- Visualization 3: Pie Chart -->
-    <div style="display: flex; align-items: flex-start;">
-        <!-- Graph Section -->
-        <div>
-            <h2>3) Incident Nature Distribution</h2>
-            <img src="{{ url_for('static', filename='pie_chart.png') }}" alt="Pie Chart" style="max-width: 600px;">
-        </div>
-
-        <!-- Explanation Section -->
-        <div style="margin-left: 20px; max-width: 400px;">
-            <h2>Graph Explanation</h2>
-            <p><strong>Description:</strong> This pie chart shows the proportion of each incident type relative to the total dataset. Each slice represents an incident type, with its size indicating its percentage of the total.</p>
-        </div>
-    </div>
-
 </body>
 </html>

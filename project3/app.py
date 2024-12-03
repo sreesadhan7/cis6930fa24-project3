@@ -32,14 +32,17 @@ def index():
             incidents_df = extract_incidents(pdf_path)
             db_conn = createdb()
             populatedb(db_conn, incidents_df)
-            cluster_and_visualize(incidents_df)  # Generate clusters and visualization
-            return render_template('result.html')
+
+            # Generate visualizations and get status output
+            status_output = cluster_and_visualize(incidents_df)
+            return render_template('result.html', status_output=status_output.to_dict(orient='records'))
 
     return render_template('index.html')
 
 @app.route('/result')
 def result():
-    return render_template('result.html')
+    # Provide default empty status_output if accessed directly
+    return render_template('result.html', status_output=[])
 
 if __name__ == '__main__':
     app.run(debug=True)
