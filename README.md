@@ -1,35 +1,66 @@
-# cis6930fa24 -- Project0
+# cis6930fa24 -- Project3
 
 Name: Sai Sree Sadhan Polimera
 
 # Assignment Description 
 
-This project involves developing a Python application that automates the extraction and processing of incident data from publicly available PDF reports issued by the Norman, Oklahoma Police Department. These reports are distributed in the form of PDFs and contain incident summaries, arrest records, and case information.
-
-The primary objective is to streamline the collection, extraction, transformation, and storage of only the incident data into a structured format, suitable for analysis and reporting. By leveraging Python, SQL, regular expressions, and command-line tools, the data will be cleaned and inserted into a relational database for further querying and analysis.
+This project involves developing a Python-based application that integrates data visualization with a user-friendly web interface. The application is built to process incident data extracted from PDFs issued by the Norman, Oklahoma Police Department. The goal is to create meaningful insights through clustering and comparison visualizations while providing users with an intuitive way to explore the data.
 
 The Incident Sumamry data can be accessed from Norman, Oklahoma police department activity reports [here](https://www.normanok.gov/public-safety/police-department/crime-prevention-data/department-activity-reports).
 
 **Assignment Objective:**
-The goal of this project is to develop a Python-based application that:
-1) Downloads incident summary PDFs from the Norman, Oklahoma Police Department’s website.
-2) Extracts relevant data fields from the PDF, including:
-      - Date/Time
-      - Incident Number
-      - Location
-      - Nature of the Incident
-      - Incident ORI
-3) Stores the extracted data into a structured format using an SQLite database.
-4) Inserts the extracted data into the database.
-5) Outputs the incident details in a structured format, along with a count of how many times each "nature" of the incident appears:
+The primary objective of this project is to build a data pipeline with the following capabilities:
 
-       Nature|Count(*)
+1) Data Extraction:
+      - Accept one or more NormanPD-style incident PDFs via a web interface (URL or file upload).
+      - Process and extract relevant fields from the PDFs, including:
+          - Date/Time
+          - Incident Number
+          - Location
+          - Nature of the Incident
+          - Incident ORI
+2) Data Storage:
+      - Store the extracted data in a structured format using an SQLite database.
+      - Insert the cleaned data into the database for efficient querying.
+3) Data Analysis and Visualizations:
+      - Generate three distinct visualizations to summarize and interpret the data:
+          - Visualization 1: Clustering of records based on their encoded incident nature.
+          - Visualization 1.1: Clustering of incident records based on their nature and frequency (count).
+          - Visualization 2: Bar graph comparing the frequency of different incident types.
+          - Visualization 3: Pie chart illustrating the proportional distribution of incident types.
+4) Interactive Web Interface:
+      - Display the generated visualizations on a web page with descriptive summaries.
+      - Show a status table listing the incident nature and its count in a clear and structured format.
    
 **Requirements:**
-1) Data Extraction: Use a Python script to download the incident summary PDF, extract relevant fields, and handle edge cases such as missing data or improperly formatted PDFs.
-2) Database Creation: Design an SQLite database that will store the incident data. This database should include a table to capture the required fields.
-3) Data Insertion: Once the data is extracted from the PDF, insert it into the SQLite database.
-4) Data Reporting: Print a list of incidents, categorized by the nature of the incident, and display how many times each category appears.
+1) Web Interface:
+      - Create a user-friendly web application using Flask.
+      - The interface should allow:
+          - PDF URL input: Accept URLs pointing to NormanPD-style incident PDFs.
+          - File upload: Allow users to upload one or more PDFs directly.
+      - Display the results (visualizations and status output) on the same page.
+2) Data Extraction:
+      - Extract the following fields from the NormanPD-style PDFs:
+          - Date/Time of the incident.
+          - Incident Number.
+          - Location.
+          - Nature of the Incident.
+          - Incident ORI (originating agency identifier).
+      - Ensure robust handling of various PDF structures and errors (e.g., malformed PDFs or missing fields).
+3) Data Storage:
+      - Store the extracted data in a structured SQLite database.
+      - Create a table with appropriate columns:
+          - `incident_time`, `incident_number`, `incident_location`, `nature`, `incident_ori`.
+      - Insert the extracted data into the database for querying and analysis.
+4) Data Analysis and Visualizations:
+      - Generate three distinct visualizations:
+          - Visualization 1: Clustering of records based on encoded nature and other features.
+          - Visualization 1.1: Clustering of nature and its count to show incident patterns.
+          - Visualization 2: A bar graph comparing incident types and their frequency.
+          - Visualization 3: A pie chart illustrating the proportional distribution of incident types.
+      - Each visualization must:
+          - Be saved in the /static directory for display in the web interface.
+          - Include labels, legends, and appropriate axis titles for clarity.
 
 # How to install
 Install pipenv using the command: 
@@ -44,6 +75,18 @@ Install PyPdf library using the command:
 
       pipenv install pypdf
 
+Install Flask Web Framework using the command: 
+
+      pipenv install flask
+
+Install scikit-learn library using the command: 
+
+      pipenv install scikit-learn
+
+Install matplotlib library using the command: 
+
+      pipenv install matplotlib
+
 Install pytest testing framework using the command: 
 
       pipenv install pytest 
@@ -53,21 +96,120 @@ To execute the project, navigate to the project directory and run the following 
 
 1) To output a page use command:
 
-         pipenv run python project0/main.py --incidents <url>
-
-   For instance (command used in my local):
-
-         pipenv run python project0/main.py --incidents "https://www.normanok.gov/sites/default/files/documents/2024-08/2024-08-01_daily_incident_summary.pdf"
-
-https://github.com/user-attachments/assets/f9ceebeb-7a52-4293-9502-c1a2f6745afd
+         python project3/app.py
 
 ## Test Cases run
-Running the following pipenv command runs the pytest cases. This project have 5 test cases.
+Running the following pipenv command runs the pytest cases. This project have 1 test cases.
 command to run test cases: 
 
       pipenv run python -m pytest -v
 
 ## Functions
+### app.py
+
+This module serves as the main entry point for the Flask-based web application. The application allows users to upload or provide a URL for NormanPD-style incident PDFs, processes the data to extract relevant fields, generates visualizations, and displays the results on a web page.
+
+Functions:
+- index() -> Renders the main page and handles PDF uploads or URLs for processing.
+- result() -> Displays the visualizations and the status table.
+
+1) **index()**
+- Renders the main page and handles data submission (via URL or file upload).
+- If the method is POST:
+    - Accepts a URL or file upload.
+    - Processes the incident PDF to extract relevant data fields.
+    - Generates visualizations (clustering, bar chart, pie chart).
+    - Displays the results on the results page.
+- Returns: Rendered HTML page with either the input form (GET) or the visualizations and table (POST).
+
+2) **result()**
+- Displays the results page with visualizations and the status table.
+- If accessed directly, provides an empty status output.
+- Returns: Rendered HTML page displaying visualizations and the incident summary table.
+
+### clustering.py
+
+- This module contains functions for data visualization and clustering analysis. 
+- The functions generate visualizations for the extracted incident data, including:
+    - Clustering of incidents.
+    - Bar graph for incident type frequency.
+    - Pie chart for proportional distribution of incidents.
+- Functions:
+    - cluster_and_visualize(incidents_df) -> Processes incident data and generates visualizations.
+- Saves all the graphs as a PNG image in the `static` directory.
+
+1) **cluster_and_visualize(incidents_df)**
+- Processes the given incident data and generates the following visualizations:
+    - Clustering of incidents based on encoded nature.
+    - Clustering of incident records based on nature and count.
+    - Bar graph comparing incident types and their frequencies.
+    - Pie chart showing proportional distribution of incident types.
+- Parameters:
+    - incidents_df (pandas.DataFrame): DataFrame containing extracted incident data.
+- Outputs:
+    - Saves generated visualizations as PNG images in the `static` directory:
+        - `cluster_plot.png` for clustering of incidents.
+        - `nature_clustering.png` for nature and count clustering.
+        - `bar_graph.png` for bar chart of incident types.
+        - `pie_chart.png` for pie chart of incident type distribution.
+- Saves all the graphs as a PNG image in the `static` directory.
+
+### Templates
+1) **index.html**
+
+- This template renders the input form for uploading or providing a URL for incident PDFs.
+- Features:
+    - A text input for entering a URL.
+    - A file upload button for uploading PDFs.
+    - A submit button to process the data.
+
+2) **result.html**
+
+- This template displays the generated visualizations and the incident summary table.
+- Features:
+    - Visualization 1: Incident Clusters.
+    - Visualization 1.1: Clustering of incident records based on nature and count.
+    - Visualization 2: Comparison of incident types (bar graph).
+    - Visualization 3: Incident nature distribution (pie chart).
+    - A status table displaying the nature of incidents and their counts.
+
+## Interface and Visualization
+
+The application begins by launching a Flask web server, providing a user-friendly interface accessible via a local web address. The user can access the web interface at `http://127.0.0.1:5000`. On the input page, users can either enter a URL to a NormanPD-style incident PDF or upload a PDF file directly from their system. Upon submission, the application processes the provided PDF by extracting key data fields such as incident time, location, nature, and identifiers. The extracted data is then stored in an SQLite database for structured analysis. Simultaneously, the application performs data clustering and visualization, generating various graphs, including a clustering scatter plot, a bar graph comparing incident frequencies, and a pie chart for incident type distribution. Finally, the results—visualizations and a status table summarizing incident counts—are displayed on a results page, providing users with clear insights into the processed data.
+
+![image](https://github.com/user-attachments/assets/110b60bd-7867-445a-bfec-8cce95d10187). 
+
+Norman data URL used in the below screenshots: https://www.normanok.gov/sites/default/files/documents/2024-11/2024-11-02_daily_incident_summary.pdf
+
+**Visualization 1: Incident Clusters**
+
+This scatter plot provides a visual representation of how incidents are grouped based on their encoded nature and incident numbers. Each point in the graph represents a unique incident, with its position determined by the incident number (X-axis) and the encoded nature of the incident (Y-axis). The incidents are grouped into clusters using the K-Means clustering algorithm, with each cluster represented by a distinct color. The purpose of this visualization is to uncover relationships and patterns among different incidents. For instance, similar incident types, such as traffic violations or thefts, might group together in clusters, indicating shared characteristics. This visualization is particularly useful for identifying commonalities or anomalies in incident data.
+
+![image](https://github.com/user-attachments/assets/82d52d49-188b-4817-b43f-6e6fd7504975)
+
+**Visualization 1.1: Clustering of Incident Records (Nature and Count)**
+
+This scatter plot focuses on clustering incident types based on their encoded nature and the frequency (count) of their occurrences. Each point in the graph represents a specific type of incident (e.g., theft, assault), and its position is determined by its encoded nature (X-axis) and the number of times it appears in the dataset (Y-axis). Using K-Means clustering, incident types with similar frequencies are grouped into clusters, with each cluster represented by a distinct color. This visualization helps highlight which incident types are common, rare, or fall into similar patterns of occurrence. For example, a high-frequency cluster might include traffic violations and theft, while lower-frequency clusters might include rare crimes like arson. This graph is valuable for prioritizing resources by identifying frequently occurring incident types.
+![image](https://github.com/user-attachments/assets/eb239791-d118-4089-9a4b-1dd8091b0093)
+
+**Visualization 2: Comparison of Incident Types**
+
+The bar graph provides a straightforward yet powerful comparison of the frequency of different incident types. Each bar represents a unique incident type (e.g., theft, assault), and its height corresponds to the total number of times that type appears in the dataset. This visualization is particularly effective for identifying the most and least frequent incident types at a glance. For instance, a tall bar for "Traffic Violations" indicates its predominance in the dataset, while a shorter bar for "Assault" suggests its relative rarity. This visualization is useful for stakeholders to understand the distribution of incidents and make data-driven decisions, such as allocating resources to address the most frequent types of incidents.
+
+![image](https://github.com/user-attachments/assets/ba14ca62-5003-4643-b0ff-5de114c3b05e)
+
+**Visualization 3: Incident Nature Distribution**
+
+The pie chart provides a proportional breakdown of the incident types in the dataset, highlighting how each type contributes to the total number of incidents. Each slice of the pie represents a specific incident type, with the size of the slice corresponding to its proportion in the dataset. For example, if "Theft" accounts for 25% of the total incidents, its slice will occupy a quarter of the chart. This visualization is particularly useful for understanding the composition of the dataset and identifying dominant incident types. It complements the bar graph by offering a more intuitive and holistic view of the data's overall distribution, helping stakeholders quickly assess which types of incidents dominate or are negligible in the dataset.
+
+![image](https://github.com/user-attachments/assets/c6b50df1-6029-48bd-a9b3-ac1cfb5e8dfb)
+
+Each visualization serves a unique purpose in exploring and understanding the dataset:
+- Incident Clusters (1): Identifies patterns and relationships between individual incidents.
+- Nature and Count Clustering (1.1): Groups incident types based on their frequency for better prioritization.
+- Bar Graph (2): Highlights the most and least common incident types for actionable insights.
+- Pie Chart (3): Offers a proportional overview of the dataset, helping to understand the composition of incidents.
+
 ### main.py
 **main(url)**
 
@@ -90,15 +232,15 @@ Code Breakdown:
         args = parser.parse_args()
 
 2) Main Function: The **main(url)** function contains the execution of the script, performing the following steps:
-    - Fetches the PDF using **project0.fetch_incidents**.
-    - Extracts incident data from the PDF using **project0.extract_incidents**.
-    - Creates a new SQLite database using **project0.createdb**.
-    - Inserts the extracted data into the database using **project0.populatedb**.
-    - Finally, prints the summary report of incidents using **project0.status**.
+    - Fetches the PDF using **project3.fetch_incidents**.
+    - Extracts incident data from the PDF using **project3.extract_incidents**.
+    - Creates a new SQLite database using **project3.createdb**.
+    - Inserts the extracted data into the database using **project3.populatedb**.
+    - Finally, prints the summary report of incidents using **project3.status**.
 
-All the functions referenced in the **main()** function, such as **fetch_incidents, extract_incidents, createdb, populatedb, and status**, are defined in the **project0.py** module.
+All the functions referenced in the **main()** function, such as **fetch_incidents, extract_incidents, createdb, populatedb, and status**, are defined in the **project3.py** module.
 
-### project0.py
+### project3.py
 1) **fetch_incidents(url)**
     - Downloads an incident summary PDF from the provided URL and saves it to a temporary file.
     - Parameters:
@@ -156,72 +298,11 @@ All the functions referenced in the **main()** function, such as **fetch_inciden
         - conn: The SQLite database connection object.
     - The status() function generates a report summarizing the incidents stored in the database. It retrieves the count of each type of incident (grouped by its nature) and prints the results in alphabetical order.
     - The results are printed to the console, showing the incident nature and its corresponding count, separated by a pipe (|).
-  
-## Example Usage to run commands:
-- To process the incident summary from a specified URL, use the following command:
-
-      pipenv run python project0/main.py --incidents "https://www.normanok.gov/sites/default/files/documents/2024-08/2024-08-01_daily_incident_summary.pdf"
 
 ### test_functions.py
 1) **test_fetch_incidents()**
 
    - Tests the fetch_incidents() function to ensure it correctly downloads a PDF from a given URL.
-   - Steps:
-       - Provides a sample URL to a PDF file for testing.
-       - Calls fetch_incidents() to download the PDF and returns the file path.
-       - Verifies that the downloaded file exists at the specified path.
-       - Cleans up by removing the temporary file after the test.
-   - This test checks whether the PDF is properly fetched and saved.
-
-2) **test_extract_incidents()**
-
-   - Tests the extract_incidents() function to ensure it correctly extracts data from a PDF and returns a pandas DataFrame.
-   - Steps:
-       - Provides a sample URL to a PDF file for testing.
-       - Calls fetch_incidents() to download the PDF and returns the file path.
-       - Calls extract_incidents() to extract incident data from the downloaded PDF.
-       - Verifies that the output is a valid pandas DataFrame.
-       - Checks if the DataFrame contains the correct columns: 'incident_time', 'incident_number', 'incident_location', 'nature', and 'incident_ori'.
-       - Ensures that the DataFrame is not empty (assuming the PDF contains data).
-       - Cleans up by removing the temporary file after the test.
-   - The test ensures that the incident data is correctly extracted from the PDF and structured in a DataFrame.
-
-3) **test_createdb()**
-
-   - Tests the createdb() function to ensure that:
-       - A new SQLite database file is created in the 'resources' directory.
-       - The 'incidents' table is correctly created in the database.
-   - Steps:
-       - Calls createdb() to create the database.
-       - Verifies that the database file exists at the expected location.
-       - Queries the 'sqlite_master' table to confirm the 'incidents' table is created.
-       - Cleans up by closing the connection.
-
-4) **test_populatedb()**
-
-   - Tests the populatedb() function to ensure that:
-       - A pandas DataFrame containing mock incident data is correctly inserted into the database.
-       - The 'incidents' table is populated with the mock data, and the data is retrievable.
-   - Steps:
-       - Creates a mock DataFrame with test incident data.
-       - Calls createdb() to create a test database.
-       - Uses populatedb() to insert the mock data into the database.
-       - Verifies that the data has been successfully inserted by querying the database.
-       - Cleans up by closing the database connection.
-
-5) **test_status(capsys)**
-
-   - Tests the status() function to ensure that the correct output is printed for the nature of incidents and their respective counts.
-   - capsys is a fixture provided by pytest that captures stdout and stderr output during the test.
-   - Steps:
-       - Creates a mock DataFrame with incident data, where 'Nature A' and 'Nature B' occur once each.
-       - Calls createdb() to create a test SQLite database.
-       - Inserts the mock data into the database using populatedb().
-       - Calls the status() function, which prints the nature of incidents and their counts.
-       - Captures the printed output using capsys.readouterr().
-       - Verifies that 'Nature A|1' and 'Nature B|1' are present in the output, ensuring the correct counts are printed.
-       - Cleans up by closing the database connection.
-     - This test ensures that the status() function correctly prints the nature of incidents and their occurrence count.
 
 ## Database Development
 This project uses an SQLite database to store and manage the incident data extracted from the incident summary PDFs. The following details outline how the database is created, structured, and used within the project.
