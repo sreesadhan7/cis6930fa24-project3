@@ -325,13 +325,6 @@ Each row in this table represents a unique incident, and the table is designed t
 **Data Insertion:**
 Data is inserted into the database using the **populatedb()** function, which reads rows from the pandas DataFrame (populated with incident data) and inserts them into the incidents table. For each row in the DataFrame, the relevant data fields are mapped to the appropriate columns in the table. The insertion process is handled within a transaction, ensuring that if an error occurs, any changes are rolled back to maintain the integrity of the database.
 
-**Querying the Data:**
-The **status()** function is used to query the database, retrieving and displaying a summary of the incident data. It executes a SQL query to group the incidents by their nature (ex: Alarm, Assault) and counts how many times each type of incident has occurred. The results are sorted alphabetically by the incident nature and printed to the console.
-
-Query to get the count of each nature of incident:
-            
-    SELECT nature, COUNT(*) as count FROM incidents GROUP BY nature ORDER BY nature ASC;
-
 **Transaction Management:**
 To ensure data integrity, all operations with the database are handled within transactions. The script commits the transaction once all rows are successfully inserted into the database. If an error occurs during insertion, a rollback is performed to revert any partial changes, preventing corrupt or incomplete data from being stored.
 
