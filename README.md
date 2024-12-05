@@ -4,7 +4,7 @@ Name: Sai Sree Sadhan Polimera
 
 # Assignment Description 
 
-This project involves developing a Python-based application that integrates data visualization with a user-friendly web interface. The application is built to process incident data extracted from PDFs issued by the Norman, Oklahoma Police Department. The goal is to create meaningful insights through clustering and comparison visualizations while providing users with an intuitive way to explore the data.
+This project involves developing a Python-based application that integrates data visualization with a user-friendly web interface. The application is built to process incident data extracted from PDFs or URLs issued by the Norman, Oklahoma Police Department. The goal is to create meaningful insights through clustering and comparison visualizations while providing users with an intuitive way to explore the data.
 
 The Incident Sumamry data can be accessed from Norman, Oklahoma police department activity reports [here](https://www.normanok.gov/public-safety/police-department/crime-prevention-data/department-activity-reports).
 
@@ -87,6 +87,10 @@ Install matplotlib library using the command:
 
       pipenv install matplotlib
 
+Install plotly library using the command: 
+
+      pipenv install plotly
+
 Install pytest testing framework using the command: 
 
       pipenv install pytest 
@@ -103,6 +107,39 @@ Running the following pipenv command runs the pytest cases. This project have 1 
 command to run test cases: 
 
       pipenv run python -m pytest -v
+
+## Code Working
+
+1) Input Handling:
+
+- On the web interface, users have two options:
+    - Enter URLs pointing to a NormanPD-style incident PDF.
+    - Upload PDFs file directly from their computer.
+- The app accepts either input and processes it after the user clicks the Submit button.
+
+2) PDF Processing:
+
+- If URLs are provided:
+    - The app downloads the PDFs from the URLs using the fetch_incidents function.
+- If files are uploaded:
+    - The app saves the uploaded files to a temporary directory.
+- The PDFs are then processed using the extract_incidents function, which extracts the incident data (date, time, location, nature, etc.).
+
+3) Data Storage:
+- The extracted data is stored in an SQLite database using the createdb and populatedb functions. This ensures the data is structured and ready for further analysis.
+
+4) Visualization:
+- The cluster_and_visualize function generates visualizations based on the extracted data:
+    - Incident Clusters: A scatter plot showing clustering of incidents based on encoded nature and other features.
+    - Nature and Count Clustering: Another scatter plot that clusters incidents by their frequency.
+    - Bar Graph: Displays the frequency of different incident types.
+    - Pie Chart: Shows the proportional distribution of incident types.
+- These visualizations are saved as static images (e.g: PNG files) in the static directory.
+
+5) Result Page:
+- After processing, the app renders a results page displaying:
+    - The generated visualizations (embedded as images).
+    - A status table summarizing the nature of incidents and their respective counts.
 
 ## Functions
 ### app.py
@@ -332,8 +369,8 @@ To ensure data integrity, all operations with the database are handled within tr
 At the end of the script execution, temporary files (such as the downloaded PDF) are deleted, and the SQLite database remains for further querying or analysis. If the script is run again, the database will be re-created, overwriting the existing file to ensure no duplicate data is stored.
 
 ## Bugs and Assumptions
-1) Assumption: The script assumes that all incident summary PDFs follow a consistent structure, including field headers, row spacing, and column formatting. Any deviation from this format may require modifications to the extraction logic.
-2) Simple Incident Structures: It is assumed that the incident data in the PDF is expected to follow a simple, table-like structure. Complex incident descriptions spanning multiple lines or columns could result in data parsing errors or incorrect extractions.
+1) Assumption: The provided PDFs follow a consistent structure that can be parsed reliably using your extraction logic.
+2) Malformed PDFs: Some PDFs may have unexpected formats, missing fields, or corrupted content that could lead to extraction errors.
 3) Inconsistent PDF Formatting: If the structure of the PDF differs from the expected format (e.g., different column spacing, missing headers), the extraction process might fail or produce incorrect data.
-4) PDF Layout Extraction Issues: The use of PyPDF's layout mode for text extraction may not perfectly capture complex layouts or images embedded within the PDF. This can cause misalignment in the extracted data fields.
-5) Temporary File Cleanup: In case of a script failure or crash, the temporary files created for downloading PDFs may not be properly cleaned up, leaving residual files in the temp directory.
+4) Slow Processing: Handling large PDFs or multiple files might cause significant delays in processing.
+5) Assumption: The clustering logic (e.g., K-Means) is appropriate for grouping incident data based on encoded fields.The dataset contains enough data points for meaningful visualizations (e.g., at least one incident per cluster).

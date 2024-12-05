@@ -14,28 +14,48 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """
+    Renders the main page and handles data submission (via URLs or multiple file uploads).
+    """
     if request.method == 'POST':
-        url = request.form.get('url')
-        pdf_path = None
+        urls = request.form.get('urls')  # Get URLs (comma-separated)
+        files = request.files.getlist('files')  # Get multiple uploaded files
 
-        # Handle URL input
-        if url:
-            pdf_path = fetch_incidents(url)
-        elif 'file' in request.files:
-            uploaded_file = request.files['file']
-            if uploaded_file.filename != '':
-                pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-                uploaded_file.save(pdf_path)
+        combined_data = pd.DataFrame()  # Initialize an empty DataFrame
 
-        # Process the PDF and visualize
-        if pdf_path:
-            incidents_df = extract_incidents(pdf_path)
-            db_conn = createdb()
-            populatedb(db_conn, incidents_df)
+        # Process URLs
+        if urls:
+            url_list = [url.strip() for url in urls.split(',')]
+            for url in url_list:
+                try:
+                    pdf_path = fetch_incidents(url)  # Download PDF from URL
+                    incidents_df = extract_incidents(pdf_path)
+                    combined_data = pd.concat([combined_data, incidents_df], ignore_index=True)
+                except Exception as e:
+                    print(f"Error processing URL {url}: {e}")
 
-            # Generate visualizations and get status output
-            status_output = cluster_and_visualize(incidents_df)
-            return render_template('result.html', status_output=status_output.to_dict(orient='records'))
+        # Process Uploaded Files
+        if files:
+            for file in files:
+                try:
+                    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+                    file.save(pdf_path)  # Save uploaded file
+                    incidents_df = extract_incidents(pdf_path)
+                    combined_data = pd.concat([combined_data, incidents_df], ignore_index=True)
+                except Exception as e:
+                    print(f"Error processing file {file.filename}: {e}")
+
+        # Ensure combined data is not empty
+        if combined_data.empty:
+            return "No valid data processed from the provided inputs."
+
+        # Store data in SQLite and generate visualizations
+        db_conn = createdb()
+        populatedb(db_conn, combined_data)
+
+        # Generate visualizations and get status output
+        status_output = cluster_and_visualize(combined_data)
+        return render_template('result.html', status_output=status_output.to_dict(orient='records'))
 
     return render_template('index.html')
 

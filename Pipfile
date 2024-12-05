@@ -11,6 +11,7 @@ flask = "*"
 scikit-learn = "*"
 matplotlib = "*"
 pandas = "*"
+plotly = "*"
 
 [dev-packages]
 
