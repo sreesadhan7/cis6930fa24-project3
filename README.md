@@ -141,6 +141,10 @@ command to run test cases:
     - The generated visualizations (embedded as images).
     - A status table summarizing the nature of incidents and their respective counts.
 
+## Video Demonstration
+
+https://github.com/user-attachments/assets/517eec09-a871-4ca0-898f-7326bd05b0dc
+
 ## Functions
 ### app.py
 
