@@ -337,9 +337,26 @@ All the functions referenced in the **main()** function, such as **fetch_inciden
     - The results are printed to the console, showing the incident nature and its corresponding count, separated by a pipe (|).
 
 ### test_functions.py
-1) **test_fetch_incidents()**
+1) **test_client()**
 
-   - Tests the fetch_incidents() function to ensure it correctly downloads a PDF from a given URL.
+   - Set up a test client for the Flask app and a temporary upload folder.
+    - This fixture initializes a Flask test client and configures a temporary directory for file uploads during testing. After the test completes, the temporary folder and its contents are cleaned up.
+    - Yields: 
+        - client (FlaskClient): A Flask test client configured for testing.
+
+2) **test_error_handling(test_client)**
+
+    - Test error handling for invalid URLs and non-PDF files.
+    - This test verifies:
+        - That the `fetch_incidents` function raises an exception for invalid URLs.
+        - That the `extract_incidents` function raises an exception for non-PDF files.
+    - Test Data:
+        - `invalid_urls`: List of invalid or non-existent URLs.
+        - `invalid_files`: List of non-PDF files created in the temporary upload folder.
+    - Args:
+        - test_client (FlaskClient): The Flask test client fixture.
+    - Raises:
+        - Exception: If `fetch_incidents` or `extract_incidents` fail to handle invalid inputs.
 
 ## Database Development
 This project uses an SQLite database to store and manage the incident data extracted from the incident summary PDFs. The following details outline how the database is created, structured, and used within the project.
