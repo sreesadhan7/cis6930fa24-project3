@@ -102,6 +102,10 @@ To execute the project, navigate to the project directory and run the following 
 
          python project3/app.py
 
+         or
+
+         pipenv run python project3/app.py         
+
 ## Test Cases run
 Running the following pipenv command runs the pytest cases. This project have 1 test cases.
 command to run test cases: 
